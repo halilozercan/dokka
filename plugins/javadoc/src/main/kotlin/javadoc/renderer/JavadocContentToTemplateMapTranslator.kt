@@ -63,14 +63,13 @@ internal class JavadocContentToTemplateMapTranslator(
         }
 
         internal fun templateMapForFunctionNode(node: JavadocFunctionNode): TemplateMap {
-            val (modifiers, signature) = node.modifiersAndSignature
             return mapOf(
                 "signature" to htmlForContentNode(node.signature, contextNode),
                 "brief" to htmlForContentNodes(node.brief, contextNode),
                 "parameters" to node.parameters.map { templateMapForParameterNode(it) },
                 "inlineParameters" to node.parameters.joinToString { "${it.type} ${it.name}" },
-                "modifiers" to htmlForContentNode(modifiers, contextNode),
-                "signatureWithoutModifiers" to htmlForContentNode(signature, contextNode),
+                "modifiers" to htmlForContentNode(node.signature.modifiers, contextNode),
+                "signatureWithoutModifiers" to htmlForContentNode(node.signature.signatureWithoutModifiers, contextNode),
                 "name" to node.name
             )
         }
@@ -140,17 +139,16 @@ internal class JavadocContentToTemplateMapTranslator(
 
         private fun templateMapForNestedClasslikeNode(node: JavadocClasslikePageNode): TemplateMap {
             return mapOf(
-                "modifiers" to (node.modifiers + "static" + node.kind).joinToString(separator = " "),
+                "modifiers" to listOf(htmlForContentNode(node.signature.modifiers, contextNode), "static",  node.kind).joinToString(separator = " "),
                 "signature" to node.name,
                 "description" to htmlForContentNodes(node.description, node)
             )
         }
 
         private fun templateMapForPropertyNode(node: JavadocPropertyNode): TemplateMap {
-            val (modifiers, signature) = node.modifiersAndSignature
             return mapOf(
-                "modifiers" to htmlForContentNode(modifiers, contextNode),
-                "signature" to htmlForContentNode(signature, contextNode),
+                "modifiers" to htmlForContentNode(node.signature.modifiers, contextNode),
+                "signature" to htmlForContentNode(node.signature.signatureWithoutModifiers, contextNode),
                 "description" to htmlForContentNodes(node.brief, contextNode)
             )
         }

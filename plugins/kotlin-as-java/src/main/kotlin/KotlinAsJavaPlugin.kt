@@ -10,7 +10,7 @@ class KotlinAsJavaPlugin : DokkaPlugin() {
     val kotlinAsJavaDocumentableToPageTranslator by extending {
         CoreExtensions.documentableTransformer with KotlinAsJavaDocumentableTransformer()
     }
-    val javaSignatureProvider by extending {
+    val javaSignatureProvider by extending(isFallback = true) {
         val dokkaBasePlugin = plugin<DokkaBase>()
         dokkaBasePlugin.signatureProvider providing { ctx ->
             JavaSignatureProvider(

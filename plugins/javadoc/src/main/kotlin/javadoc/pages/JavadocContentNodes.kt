@@ -137,3 +137,13 @@ class LinkJavadocListEntry(
 data class RowJavadocListEntry(val link: LinkJavadocListEntry, val doc: List<ContentNode>) : JavadocListEntry {
     override val stringTag: String = ""
 }
+
+data class JavadocSignatureContentNode(
+    val dri: DRI,
+    val kind: Kind = ContentKind.Symbol,
+    val annotations: ContentNode?,
+    val modifiers: ContentNode,
+    val signatureWithoutModifiers: ContentNode,
+): JavadocContentNode(setOf(dri), kind, signatureWithoutModifiers.sourceSets) {
+    override fun hasAnyContent(): Boolean = true
+}

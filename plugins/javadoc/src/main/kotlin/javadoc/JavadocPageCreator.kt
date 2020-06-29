@@ -12,10 +12,7 @@ import org.jetbrains.dokka.model.doc.Description
 import org.jetbrains.dokka.model.doc.TagWrapper
 import org.jetbrains.dokka.model.properties.PropertyContainer
 import org.jetbrains.dokka.model.properties.WithExtraProperties
-import org.jetbrains.dokka.pages.ContentKind
-import org.jetbrains.dokka.pages.ContentNode
-import org.jetbrains.dokka.pages.ContentText
-import org.jetbrains.dokka.pages.DCI
+import org.jetbrains.dokka.pages.*
 import org.jetbrains.dokka.utilities.DokkaLogger
 
 open class JavadocPageCreator(
@@ -43,8 +40,7 @@ open class JavadocPageCreator(
                 name = c.name.orEmpty(),
                 content = contentForClasslike(c),
                 dri = setOf(c.dri),
-                modifiers = listOfNotNull(c.visibility[jvm]?.name),
-                signature = signatureProvider.signature(c).nodeForJvm(jvm),
+                signature = signatureProvider.signature(c).nodeForJvm(jvm).asJavadocNode(),
                 description = c.descriptionToContentNodes(),
                 constructors = (c as? WithConstructors)?.constructors?.mapNotNull { it.toJavadocFunction() }.orEmpty(),
                 methods = c.functions.mapNotNull { it.toJavadocFunction() },
@@ -56,7 +52,7 @@ open class JavadocPageCreator(
                 classlikes = c.classlikes.mapNotNull { pageForClasslike(it) },
                 properties = c.properties.map {
                     JavadocPropertyNode(
-                        signatureProvider.signature(it).nodeForJvm(jvm),
+                        signatureProvider.signature(it).nodeForJvm(jvm).asJavadocNode(),
                         it.descriptionToContentNodes(jvm)
                     )
                 },
@@ -139,7 +135,7 @@ open class JavadocPageCreator(
         JavadocFunctionNode(
             name = name,
             dri = dri,
-            signature = signatureProvider.signature(this).nodeForJvm(jvm),
+            signature = signatureProvider.signature(this).nodeForJvm(jvm).asJavadocNode(),
             brief = brief(jvm),
             parameters = parameters.map {
                 JavadocParameterNode(
@@ -189,5 +185,8 @@ open class JavadocPageCreator(
         }
         return contents
     }
+
+    private fun ContentNode.asJavadocNode(): JavadocSignatureContentNode =
+        (this as ContentGroup).children.firstOrNull() as JavadocSignatureContentNode
 }
 
